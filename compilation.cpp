@@ -1,6 +1,7 @@
 /* 
-TODO 
-  - check Noeud A E P I (Analyse Lexical)
+TODO
+  - projet modulaire
+  - check Noeud  I (Analyse Lexical) isKeyword(int)
   - check plus unaire ou addition
   - Gencode
 */
@@ -18,33 +19,35 @@ TODO
 // Type à repérer
 enum TokenType
 {
-  K,        // Constante
-  I,        // Identificateur
-  SPlus,    // +
-  SMoins,   // -
-  SDiv,     // /
-  SMult,    // *
-  Segal,    // =
-  ParaO,    // (
-  ParaF,    // )
-  AccO,     // {
-  AccF,     // }
-  Pvirgule, // ;
-  virgule,  // ,
-  EOF_,
+  tokenK,        // Constante
+  tokenI,        // Identificateur
+  tokenPlus,    // +
+  tokenMoins,   // -
+  tokenDiv,     // /
+  tokenMult,    // *
+  tokenEgal,    // =
+  tokenParaO,    // (
+  tokenParaF,    // )
+  tokenAccO,     // {
+  tokenAccF,     // }
+  tokenPvirgule, // ;
+  tokenvirgule,  // ,
+  tokenEOF_,
   token_int,
-  debug
+  tokendebug
 };
 
 enum NoeudType
 {
   noeudK,
   noeudI,        // Identificateur
-  noeudSPlusUnaire,    // +
-  noeudSMoinsUnaire,   // -
-  noeudSDiv,     // /
-  noeudSMult,    // *
-  noeudSegal,    // =
+  noeudPlusUnaire,    // +
+  noeudMoinsUnaire,   // -
+  noeudAddition,
+  noeudSoustraction,
+  noeudDiv,     // /
+  noeudMult,    // *
+  noeudEgal,    // =
   noeudParaO,    // (
   noeudParaF,    // )
   noeudAccO,     // {
@@ -59,8 +62,8 @@ enum NoeudType
   noeudSeq, // I
   noeudDecl, // I
   noeudVide, 
+  noeudAppel,
 };
-
 
 const char SIGNE_MOINS = '-';
 const char SIGNE_PLUS = '+';
@@ -71,10 +74,10 @@ const char PARA_FERM = ')';
 const char SIGNE_EGAL = '=';
 const char ACC_OUV = '{';
 const char ACC_FERM = '}';
-const char POINT_VIRGULE = ';';
-const char VIRGULE = ',';
+const char POINT_tokenVIRGULE = ';';
+const char tokenVIRGULE = ',';
 
-const std::string DEBUG = "dbg";
+const std::string tokenDEBUG = "dbg";
 
 int nbVar = 0;
 NoeudType variableLocale;
@@ -117,9 +120,26 @@ public:
   }
 };
 
-Noeud A();
-Noeud E();
-Noeud P();
+
+class Operateur
+{
+public:
+  TokenType m_cle;
+  NoeudType m_token;
+  int m_priorite;
+  int m_assoDroite;
+  Operateur(TokenType cle, NoeudType token, int priorite, int assoDroite) : m_cle(cle), m_token(token), m_priorite(priorite), m_assoDroite(assoDroite) {}
+  Operateur(){}
+};
+
+std::vector<Operateur> listeOperateurs;
+
+
+Noeud A(); //Atome
+Noeud E(int minPriorite); //Expression
+Noeud P(); //Préfixe
+Noeud S(); //Suffixe
+Noeud I_();
 
 Token tokenCurrent;
 Token tokenLast;
@@ -130,53 +150,53 @@ int nbToken;
 // Fonction d'affichage des tokens
 void printAnaLex()
 {
-  if (tokenLast.type == K)
+  if (tokenLast.type == tokenK)
   {
     std::cout << tokenLast.value << " : constante" << std::endl;
   }
-  else if (tokenLast.type == I)
+  else if (tokenLast.type == tokenI)
   {
     std::cout << tokenLast.value << " : identificateur" << std::endl;
   }
-  else if (tokenLast.type == SPlus)
+  else if (tokenLast.type == tokenPlus)
   {
     std::cout << tokenLast.value << " : Signe plus" << std::endl;
   }
-  else if (tokenLast.type == SMoins)
+  else if (tokenLast.type == tokenMoins)
   {
     std::cout << tokenLast.value << " : Signe moins" << std::endl;
   }
-  else if (tokenLast.type == SMult)
+  else if (tokenLast.type == tokenMult)
   {
     std::cout << tokenLast.value << " : Signe mult" << std::endl;
   }
-  else if (tokenLast.type == SDiv)
+  else if (tokenLast.type == tokenDiv)
   {
     std::cout << tokenLast.value << " : Signe div" << std::endl;
   }
-  else if (tokenLast.type == ParaO)
+  else if (tokenLast.type == tokenParaO)
   {
     std::cout << tokenLast.value << " : Signe (" << std::endl;
   }
-  else if (tokenLast.type == ParaF)
+  else if (tokenLast.type == tokenParaF)
   {
     std::cout << tokenLast.value << " : Signe )" << std::endl;
   }
-  else if (tokenLast.type == Segal)
+  else if (tokenLast.type == tokenEgal)
   {
     std::cout << tokenLast.value << " : Signe =" << std::endl;
   }
-  else if (tokenLast.type == AccO)
+  else if (tokenLast.type == tokenAccO)
   {
     std::cout << tokenLast.value << " : Signe {" << std::endl;
   }
-  else if (tokenLast.type == AccF)
+  else if (tokenLast.type == tokenAccF)
   {
     std::cout << tokenLast.value << " : Signe }" << std::endl;
   }
-  else if (tokenLast.type == virgule)
+  else if (tokenLast.type == tokenvirgule)
   {
-    std::cout << tokenLast.value << " : Signe virgule" << std::endl;
+    std::cout << tokenLast.value << " : Signe tokenvirgule" << std::endl;
   }
 }
 
@@ -197,13 +217,13 @@ void next()
   // On vérifie si on est arrivé à la fin de la ligne
   if ((line.size() == 0))
   {
-    tokenCurrent.type = EOF_;
+    tokenCurrent.type = tokenEOF_;
   }
 
   // Le caractère courant est un identificateur
   if (std::isalpha(line[0]) && line.size() > 0)
   {
-    tokenCurrent.type = I;
+    tokenCurrent.type = tokenI;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
 
@@ -213,21 +233,21 @@ void next()
       tokenCurrent.value += (line[0]);
       line.erase(0, 1);
     }
-    if(tokenCurrent.value.compare(DEBUG) == 0){
-      tokenCurrent.type = debug;
+    if(tokenCurrent.value.compare(tokenDEBUG) == 0){
+      tokenCurrent.type = tokendebug;
     }
   }
 
-  else if (line[0] == POINT_VIRGULE && line.size() > 0)
+  else if (line[0] == POINT_tokenVIRGULE && line.size() > 0)
   {
-    tokenCurrent.type = Pvirgule;
+    tokenCurrent.type = tokenPvirgule;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
 
-  else if (line[0] == VIRGULE && line.size() > 0)
+  else if (line[0] == tokenVIRGULE && line.size() > 0)
   {
-    tokenCurrent.type = virgule;
+    tokenCurrent.type = tokenvirgule;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -235,7 +255,7 @@ void next()
   // Le caractère courant est signe +
   else if (line[0] == SIGNE_PLUS && line.size() > 0)
   {
-    tokenCurrent.type = SPlus;
+    tokenCurrent.type = tokenPlus;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -243,7 +263,7 @@ void next()
   // Le caractère courant est signe -
   else if (line[0] == SIGNE_MOINS && line.size() > 0)
   {
-    tokenCurrent.type = SMoins;
+    tokenCurrent.type = tokenMoins;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -251,7 +271,7 @@ void next()
   // Le caractère courant est signe *
   else if (line[0] == SIGNE_MULT && line.size() > 0)
   {
-    tokenCurrent.type = SMult;
+    tokenCurrent.type = tokenMult;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -259,7 +279,7 @@ void next()
   // Le caractère courant est signe /
   else if (line[0] == SIGNE_DIV && line.size() > 0)
   {
-    tokenCurrent.type = SDiv;
+    tokenCurrent.type = tokenDiv;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -267,7 +287,7 @@ void next()
   // Le caractère courant est signe (
   else if (line[0] == PARA_OUV && line.size() > 0)
   {
-    tokenCurrent.type = ParaO;
+    tokenCurrent.type = tokenParaO;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -275,7 +295,7 @@ void next()
   // Le caractère courant est signe )
   else if (line[0] == PARA_FERM && line.size() > 0)
   {
-    tokenCurrent.type = ParaF;
+    tokenCurrent.type = tokenParaF;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -283,7 +303,7 @@ void next()
   // Le caractère courant est signe {
   else if (line[0] == ACC_OUV && line.size() > 0)
   {
-    tokenCurrent.type = AccO;
+    tokenCurrent.type = tokenAccO;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -291,7 +311,7 @@ void next()
   // Le caratère courant est signe }
   else if (line[0] == ACC_FERM && line.size() > 0)
   {
-    tokenCurrent.type = AccF;
+    tokenCurrent.type = tokenAccF;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
   }
@@ -299,7 +319,7 @@ void next()
   // Le caractère courant est une constante
   else if (isdigit(line[0]) && line.size() > 0)
   {
-    tokenCurrent.type = K;
+    tokenCurrent.type = tokenK;
     tokenCurrent.value = line[0];
     line.erase(0, 1);
 
@@ -332,89 +352,161 @@ void accept(TokenType T)
 }
 
 Noeud A(){
-  if (check(K))
-  {
+  Noeud n;
+  if (check(tokenK))  {
     return Noeud(noeudK, tokenLast.value);
   }
-  else if (check(I))
-  {
-    std::cout << "ERREUR FATALE" << std::endl;
-    exit(0);
+  else if (check(tokenI)) {
+    return Noeud(noeudRef, tokenLast.value);
   }
-  else if (check(ParaO)){
-    E();
-    accept(ParaF);
-    return Noeud(noeudParaO);
+  else if (check(tokenParaO)){
+    Noeud n = E(0);
+    accept(tokenParaF);
+    return n;
+  }
+  else {
+    printf("ERREUR FATALE - %s\n", tokenCurrent.value);
+    exit(1);
   }
 }
 
 Noeud P() {
-  if (check(SMoins))
+  Noeud n;
+  if (check(tokenMoins))
   {
     Noeud N = P();
     std::vector<Noeud> v;
     v.push_back(N);
-    return Noeud(noeudSMoinsUnaire, v);
-  } // TODO else if(check(pointExclam))
-  else if (check(SPlus))
+    return Noeud(noeudMoinsUnaire, v);
+  } // TODO: else if(check(pointExclam))
+    // TODO: else if(check(esperluette))
+  else if (check(tokenPlus))
   {
-    Noeud N = P();
-    std::vector<Noeud> v;
-    v.push_back(N);
-    return Noeud(noeudSPlusUnaire, v);
+    return P();
   }
-  else
-  {
-    Noeud N = A();
-    return N;
+  else {
+    return S();
   }
 }
 
-Noeud E() {
-  return P();
+Noeud S() {
+  Noeud n = A();
+  if(check(tokenParaO)) {
+    Noeud n_ = Noeud(noeudAppel);
+    n.m_sousNoeud.push_back(n);
+    while(!check(tokenParaF)) {
+      n_.m_sousNoeud.push_back(E(0));
+      if(check(tokenParaF)) {
+        break;
+      }
+      check(tokenvirgule);
+    }
+    return n_;
+  }
+  return n;
 }
 
+bool operateursContient(TokenType type){
+  for(Operateur operateur : listeOperateurs) {
+    if(operateur.m_cle == type) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+Noeud E(int minPriorite) { 
+  Noeud n = P();
+  while(operateursContient(tokenCurrent.type)){
+    Operateur o;
+    for (Operateur operateur : listeOperateurs){
+      if (operateur.m_cle == tokenCurrent.type){
+        o = operateur;
+      }
+    }
+    if(o.m_priorite > minPriorite){
+      next();
+      Noeud n_ = E(o.m_priorite - o.m_assoDroite);
+      n = Noeud(o.m_token);
+      n.m_sousNoeud.push_back(n_);
+    }
+    else {
+      break;
+    }
+  }
+  return n;
+}
 
 
 Noeud I_() {
-  if (check(Pvirgule)){
+  if (check(tokenPvirgule)){
     return Noeud(noeudVide);
   }
-  else if (check(AccO)) {
+  else if (check(tokenAccO)) {
     Noeud N = Noeud(noeudBlock); 
-    while (!check(AccF)){
+    while (!check(tokenAccF)){
       N.m_sousNoeud.push_back(I_());
     }
     return N;
   } 
-  else if (check(debug)) {  
-    Noeud N = E();
-    accept(Pvirgule);
-    std::vector<Noeud> v;
-    v.push_back(N);
-    return Noeud(noeudDebug, v);
-  } 
-  else if (check(I)) {
-    return Noeud(noeudRef, tokenLast.value);
-  } 
+  else if (check(tokendebug)) {  
+    Noeud N = E(0);
+    accept(tokenPvirgule);
+    Noeud n = Noeud(noeudDebug);
+    n.m_sousNoeud.push_back(N);
+    return n;
+  } //TODO: token_return
+  // else if (check(I)) {
+  //   return Noeud(noeudRef, tokenLast.value);
+  // } 
   else if (check(token_int)) {
     Noeud N = Noeud(noeudSeq);
     do {
-      accept(I);
+      accept(tokenI);
       N.ajouterEnfant(Noeud(noeudDecl, tokenLast.value));
-    } while (check(virgule));
-    accept(Pvirgule);
+    } while (check(tokenvirgule));
+    accept(tokenPvirgule);
     return N;
-  } else {
-    Noeud N = E();
+  }
+  else if (check(tokenvirgule)) {
+    Noeud N = Noeud(noeudSeq);
+    do {
+      accept(tokenI);
+      N.ajouterEnfant(Noeud(noeudDecl, tokenLast.value));
+    } while (check(tokenvirgule));
+    accept(tokenPvirgule);
+    return N;
+  }
+  //TODO: If
+  //TODO: While
+  //TODO: break_token
+  //TODO: continue_token
+  else {
+    Noeud N = E(0);
+    accept(tokenPvirgule);
     std::vector<Noeud> v;
     v.push_back(N);
-    accept(Pvirgule);
     return Noeud(noeudDrop, v);
   }
 }
 
+void setListeOperateurs() {
+  listeOperateurs.push_back(Operateur(tokenEgal, noeudEgal, 1, 1));
+  listeOperateurs.push_back(Operateur(tokenPlus, noeudAddition, 6, 0));
+  listeOperateurs.push_back(Operateur(tokenMoins, noeudSoustraction, 6, 0));
+  listeOperateurs.push_back(Operateur(tokenMult, noeudMult, 7, 0));
+  listeOperateurs.push_back(Operateur(tokenDiv, noeudDiv, 7, 0));
+  // modulo %
+  // ||
+  // &&
+  // <
+  // >
+  // ==
+}
+
 Noeud AnalSyn() {
+  setListeOperateurs();
   return I_();
 }
 
@@ -517,12 +609,12 @@ void GenCode(Noeud N) {
     case noeudK :
       printf("push", N.m_valeur);
       break;
-    // case noeudSMoins :
+    // case noeudtokenMoins :
     //   GenCode(N.m_sousNoeud[0]);
     //   GenCode(N.m_sousNoeud[1]);
     //   printf("sub \n");
     //   break;
-    // case noeudSPlus:
+    // case noeudtokenPlus:
     //   GenCode(N.m_sousNoeud[0]);
     //   GenCode(N.m_sousNoeud[1]);
     //   printf("add \n");
@@ -531,9 +623,9 @@ void GenCode(Noeud N) {
 }
 
 int main() {
-  line = "123 (465)";
+  line = "123 (465) 123";
   next();
-  while (tokenCurrent.type != EOF_){
+  while (tokenCurrent.type != tokenEOF_){
     GenCode(AnalSyn()); // TODO: Ajouter analyse sémantique
   }
   return 0;
