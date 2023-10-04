@@ -365,7 +365,7 @@ Noeud A(){
     return n;
   }
   else {
-    printf("ERREUR FATALE - %s\n", tokenCurrent.value);
+    std::cout <<"ERREUR FATALE - " << tokenCurrent.value << std::endl;
     exit(1);
   }
 }
@@ -607,7 +607,7 @@ void AnalSem(Noeud N){
 void GenCode(Noeud N) {
   switch (N.m_type){
     case noeudK :
-      printf("push", N.m_valeur);
+      std::cout << "push" <<  N.m_valeur << std::endl;
       break;
     // case noeudtokenMoins :
     //   GenCode(N.m_sousNoeud[0]);
@@ -623,7 +623,7 @@ void GenCode(Noeud N) {
 }
 
 int main() {
-  line = "123 (465) 123";
+  line = "123 (465)123";
   next();
   while (tokenCurrent.type != tokenEOF_){
     GenCode(AnalSyn()); // TODO: Ajouter analyse sémantique
