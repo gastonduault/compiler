@@ -1,4 +1,5 @@
-std::string line;
+std::string code;
+
 
 void printAnaLex()
 {
@@ -52,125 +53,153 @@ void printAnaLex()
     }
 }
 
+bool mot(std::string m) {
+    int i = 0;
+    while(m[i] == code[i] && i<=m.size() && i<=code.size()){
+        i++;
+    }
+    return i == m.size();
+}
 
 void lecture() {
-    while (std::isspace(line[0]) && line.size() > 0)
+    while (std::isspace(code[0]) && code.size() > 0)
     {
-        line.erase(0, 1);
+        code.erase(0, 1);
     }
 
-    if ((line.size() == 0))
+    if ((code.size() == 0))
     {
         tokenCurrent.type = tokenEOF_;
     }
 
-    if (std::isalpha(line[0]) && line.size() > 0)
+    if(mot("if")) {
+        tokenCurrent.value = "if";
+        tokenCurrent.type = token_if;
+        code.erase(0,2);
+        std::cout << "\n reste de la ligne : " << code << "\n" << std::endl;
+    }
+
+    else if(mot("int")) {
+        tokenCurrent.value = "int";
+        tokenCurrent.type = token_int;
+        code.erase(0,3);
+        std::cout << "\n reste de la ligne : " << code << "\n" << std::endl;
+    }
+
+    else if(mot("else")) {
+        tokenCurrent.value = "else";
+        tokenCurrent.type = token_else;
+        code.erase(0, 4);
+        std::cout << "\n reste de la ligne : " << code << "\n" << std::endl;
+    }
+
+    else if (std::isalpha(code[0]) && code.size() > 0)
     {
         tokenCurrent.type = tokenI;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
 
         // Les caractères qui suivent sont aussi des identificateurs
-        while (std::isalpha(line[0]) && line.size() > 0)
+        while (std::isalpha(code[0]) && code.size() > 0)
         {
-            tokenCurrent.value += (line[0]);
-            line.erase(0, 1);
+            tokenCurrent.value += (code[0]);
+            code.erase(0, 1);
         }
         if(tokenCurrent.value.compare(tokenDEBUG) == 0){
             tokenCurrent.type = tokendebug;
         }
     }
 
-    else if (line[0] == POINT_tokenVIRGULE && line.size() > 0)
+    else if (code[0] == POINT_tokenVIRGULE && code.size() > 0)
     {
         tokenCurrent.type = tokenPvirgule;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
-    else if (line[0] == tokenVIRGULE && line.size() > 0)
+    else if (code[0] == tokenVIRGULE && code.size() > 0)
     {
         tokenCurrent.type = tokenvirgule;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est signe +
-    else if (line[0] == SIGNE_PLUS && line.size() > 0)
+    else if (code[0] == SIGNE_PLUS && code.size() > 0)
     {
         tokenCurrent.type = tokenPlus;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est signe -
-    else if (line[0] == SIGNE_MOINS && line.size() > 0)
+    else if (code[0] == SIGNE_MOINS && code.size() > 0)
     {
         tokenCurrent.type = tokenMoins;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est signe *
-    else if (line[0] == SIGNE_MULT && line.size() > 0)
+    else if (code[0] == SIGNE_MULT && code.size() > 0)
     {
         tokenCurrent.type = tokenMult;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est signe /
-    else if (line[0] == SIGNE_DIV && line.size() > 0)
+    else if (code[0] == SIGNE_DIV && code.size() > 0)
     {
         tokenCurrent.type = tokenDiv;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est signe (
-    else if (line[0] == PARA_OUV && line.size() > 0)
+    else if (code[0] == PARA_OUV && code.size() > 0)
     {
         tokenCurrent.type = tokenParaO;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est signe )
-    else if (line[0] == PARA_FERM && line.size() > 0)
+    else if (code[0] == PARA_FERM && code.size() > 0)
     {
         tokenCurrent.type = tokenParaF;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est signe {
-    else if (line[0] == ACC_OUV && line.size() > 0)
+    else if (code[0] == ACC_OUV && code.size() > 0)
     {
         tokenCurrent.type = tokenAccO;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caratère courant est signe }
-    else if (line[0] == ACC_FERM && line.size() > 0)
+    else if (code[0] == ACC_FERM && code.size() > 0)
     {
         tokenCurrent.type = tokenAccF;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
     }
 
         // Le caractère courant est une constante
-    else if (isdigit(line[0]) && line.size() > 0)
+    else if (isdigit(code[0]) && code.size() > 0)
     {
         tokenCurrent.type = tokenK;
-        tokenCurrent.value = line[0];
-        line.erase(0, 1);
+        tokenCurrent.value = code[0];
+        code.erase(0, 1);
 
         // Les caractères qui suivent sont aussi des constantes
-        while (isdigit(line[0]) && line.size() > 0)
+        while (isdigit(code[0]) && code.size() > 0)
         {
-            tokenCurrent.value += (line[0]);
-            line.erase(0, 1);
+            tokenCurrent.value += (code[0]);
+            code.erase(0, 1);
         }
     }
 }

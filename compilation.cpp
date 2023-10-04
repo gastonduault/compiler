@@ -1,15 +1,15 @@
-/* 
-TODO
-  - projet modulaire
-  - check Noeud  I (Analyse Lexical) isKeyword(int)
-  - check plus unaire ou addition
-  - Gencode
-*/
+//TODO: lecture de tout le fichier dans un string
+//TODO: check plus unaire ou addition (pr tous les signes: && == -- || )
+//TODO: check  fonction
+//TODO: check while if else (Syntaxique)
+//TODO: Gencode
+//TODO: Doit-on faire un main qui appelle compile ?
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <stdlib.h>
+#include <fstream>
 
 #include "./Types.cpp"
 #include "./Objets/Token.cpp"
@@ -18,106 +18,8 @@ TODO
 #include "./Objets/Noeud.cpp"
 #include "./Analyses/AnalyseLexicale.cpp"
 #include "./Analyses/AnalyseSyntaxique.cpp"
+#include "./Analyses/AnalyseSemantique.cpp"
 
-
-
-int nbVar = 0;
-NoeudType variableLocale;
-
-
-Symbole declarer  (std::string nom){
-  for (int i = Variables.size() - 1; i >= 0; i--){
-    if(Variables[i].m_nom.compare(nom) == 0) {
-      std::cout << "ERREUR FATALE | declarer()" << std::endl;
-      exit(1);
-    }if(Variables[i].m_nom.compare("") == 0) {
-      break;
-    }
-  }
-  Symbole S = Symbole(nom);
-  Variables.push_back(S);
-  return S;
-}
-
-Symbole chercher(std::string nom) {
-  for (int i = Variables.size() - 1; i >= 0; i--){
-    if(Variables[i].m_nom.compare(nom) == 0){
-      return Variables[i];
-    }
-  }
-  std::cout << "ERREUR FATALE | chercher()" << std::endl;
-  exit(1);
-}
-
-void begin() {
-  Variables.push_back(Symbole(""));
-}
-
-void end() {
-  for (int i = Variables.size() - 1; i >= 0; i--){
-    if (Variables[i].m_nom.compare("") == 0){
-      Variables.pop_back();
-      break;
-    }
-    Variables.pop_back();
-  }
-}
-
-void AnalSem(Noeud N){
-  Symbole S;
-  switch (N.m_type)
-  {
-  default:
-    for (int i = 0; i <= N.m_sousNoeud.size(); i++)
-    {
-      AnalSem(N.m_sousNoeud[i]);
-    }
-    break;
-  case noeudBlock:
-    begin();
-    for (int i = 0; i <= N.m_sousNoeud.size(); i++)
-    {
-      AnalSem(N.m_sousNoeud[i]);
-    }
-    end();
-    break;
-  case noeudDecl:
-    S = declarer(N.m_valeur);
-    S.position = nbVar;
-    nbVar++;
-    S.m_type = variableLocale;
-    break;
-  case noeudRef:
-    S = chercher(N.m_valeur);
-    N.m_symbole = S;
-    break;
-  }
-}
-
-// Noeud analyseSem(Noeud N)
-// {
-//   // switch(N.m_type)
-//   // {
-//   // default:
-//   // pour chaque enfant E AnalyseSem(E);
-
-//   // case Noeud_Block:
-//   // pour chaque enfant E
-//   // Begin()
-//   // Pour chaque enfant E
-//   // AnalyseSem(E)
-//   // End()
-
-//   // case Noeud_Declaration:
-//   //  Declare(N.m_valeur)
-//   // S.position = nbvar
-//   // Nbvar++
-//   // S.type = VariableLocale
-//   //  case Noeud_Ref:
-//   // S = chercher(N.valeur)
-//   // N.Symbole = S
-//   // }
-// }
 
 void GenCode(Noeud N) {
   switch (N.m_type){
@@ -137,11 +39,34 @@ void GenCode(Noeud N) {
   }
 }
 
+std::string lectureFichier(){
+  std::ifstream file("/home/gaston/Documents/Polytech/compilation/Tests/prog1.c");
+//  if(file) {
+//    auto tailleSize = file.tellg();
+//    file.seekg(std::ios::beg);
+//    std::string content(file.tellg(), 0);
+//    file.read(&content[0], tailleSize);
+//    return content;
+//  }
+  if ( file ) {
+    std::string line;
+    getline(file,line);
+    return line;
+  }
+  else{
+    printf("ERREUR FATALE | erreur lecture fichier");
+    exit(1);
+  }
+}
+
+
 int main() {
-  line = "123";
+  code = lectureFichier();
+  Noeud noeud;
   next();
   while (tokenCurrent.type != tokenEOF_){
-    GenCode(AnalSyn()); // TODO: Ajouter analyse sémantique
+    noeud = AnalSyntaxique();
+    GenCode(noeud); // TODO: Ajouter analyse sémantique
   }
   return 0;
 }

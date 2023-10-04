@@ -20,7 +20,9 @@ enum TokenType
     tokenvirgule,  // ,
     tokenEOF_,
     token_int,
-    tokendebug
+    token_if,
+    token_else,
+    tokendebug, //TODO: token ==
 };
 
 enum NoeudType

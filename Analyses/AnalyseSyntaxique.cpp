@@ -1,5 +1,5 @@
 
-Noeud AnalSyn() {
+Noeud AnalSyntaxique() {
     setListeOperateurs();
     return Instruction();
 }
