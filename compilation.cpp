@@ -1,9 +1,32 @@
-//TODO: lecture de tout le fichier dans un string
-//TODO: check plus unaire ou addition (pr tous les signes: && == -- || )
-//TODO: check  fonction
-//TODO: check while if else (Syntaxique)
-//TODO: Gencode
-//TODO: Doit-on faire un main qui appelle compile ?
+/*
+TODO: lecture de tout le fichier dans un string
+TODO: check plus unaire ou addition (pr tous les signes: && == -- || )
+TODO: check  fonction
+TODO: check while if else (Syntaxique)
+TODO: Gencode
+  - addition
+  - soustraction
+  - not
+  -multiplication
+  -division
+  - moins_unaire
+  - pointeur_adresse
+  - noeud ET
+  - noeud return
+  - noeud drop
+  - noeud declaration
+  - noeud ==
+  - noeud !=
+  - noeud reference
+  - noeud affectation
+  - continue
+  - break
+  - target
+  - fonction
+  - loop
+  - appel
+TODO: Doit-on faire un main qui appelle compile ?
+*/
 
 #include <iostream>
 #include <string>
@@ -19,25 +42,8 @@
 #include "./Analyses/AnalyseLexicale.cpp"
 #include "./Analyses/AnalyseSyntaxique.cpp"
 #include "./Analyses/AnalyseSemantique.cpp"
+#include "./GenCode.cpp"
 
-
-void GenCode(Noeud N) {
-  switch (N.m_type){
-    case noeudK :
-      std::cout << "push" <<  N.m_valeur << std::endl;
-      break;
-    // case noeudtokenMoins :
-    //   GenCode(N.m_sousNoeud[0]);
-    //   GenCode(N.m_sousNoeud[1]);
-    //   printf("sub \n");
-    //   break;
-    // case noeudtokenPlus:
-    //   GenCode(N.m_sousNoeud[0]);
-    //   GenCode(N.m_sousNoeud[1]);
-    //   printf("add \n");
-    //   break;
-  }
-}
 
 std::string lectureFichier(){
   std::ifstream file("/home/gaston/Documents/Polytech/compilation/Tests/prog1.c");
@@ -66,7 +72,8 @@ int main() {
   next();
   while (tokenCurrent.type != tokenEOF_){
     noeud = AnalSyntaxique();
-    GenCode(noeud); // TODO: Ajouter analyse sémantique
+    AnalyseSementique(noeud);
+    GenCode(noeud);
   }
   return 0;
 }

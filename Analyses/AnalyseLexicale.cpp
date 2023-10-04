@@ -76,21 +76,18 @@ void lecture() {
         tokenCurrent.value = "if";
         tokenCurrent.type = token_if;
         code.erase(0,2);
-        std::cout << "\n reste de la ligne : " << code << "\n" << std::endl;
     }
 
     else if(mot("int")) {
         tokenCurrent.value = "int";
         tokenCurrent.type = token_int;
         code.erase(0,3);
-        std::cout << "\n reste de la ligne : " << code << "\n" << std::endl;
     }
 
     else if(mot("else")) {
         tokenCurrent.value = "else";
         tokenCurrent.type = token_else;
         code.erase(0, 4);
-        std::cout << "\n reste de la ligne : " << code << "\n" << std::endl;
     }
 
     else if (std::isalpha(code[0]) && code.size() > 0)

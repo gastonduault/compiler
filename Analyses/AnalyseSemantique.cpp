@@ -46,7 +46,7 @@ void AnalyseSementique(Noeud N){
   switch (N.m_type)
   {
     default:
-      for (int i = 0; i <= N.m_sousNoeud.size(); i++)
+      for (int i = 0; i < N.m_sousNoeud.size(); i++)
       {
         AnalyseSementique(N.m_sousNoeud[i]);
       }
