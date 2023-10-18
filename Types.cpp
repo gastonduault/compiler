@@ -46,11 +46,18 @@ enum NoeudType
     noeudBlock,
     noeudDrop,
     noeudRef, //Expression
-    noeudAffect, //Expression
+    noeudAffect,
     noeudSeq, // I
     noeudDecl, // I
     noeudVide,
     noeudAppel,
+    noeudFonction,
+    noeudIndirection,
+};
+
+enum Types {
+  fonction,
+  variableLocal
 };
 
 const char SIGNE_MOINS = '-';

@@ -1,7 +1,25 @@
 
 Noeud AnalSyntaxique() {
-    setListeOperateurs();
-    return Instruction();
+    Noeud n;
+    accept(token_int);
+    accept(tokenI);
+    n = Noeud(noeudFonction, tokenLast.value);
+    accept(tokenParaO);
+    while(check(token_int)) {
+        accept(tokenI);
+        n.ajouterEnfant(Noeud(noeudDecl, tokenLast.value));
+        if(check(tokenvirgule)){
+            continue;
+        }else{
+            break;
+        }
+    }
+
+    accept(tokenParaF);
+    Noeud ins = Instruction();
+    n.ajouterEnfant(ins);
+
+    return n;
 }
 
 Noeud Atome(){

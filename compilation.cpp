@@ -7,8 +7,8 @@ TODO: Gencode
   - addition
   - soustraction
   - not
-  -multiplication
-  -division
+  - multiplication
+  - division
   - moins_unaire
   - pointeur_adresse
   - noeud ET
@@ -28,7 +28,7 @@ TODO: Gencode
 TODO: Doit-on faire un main qui appelle compile ?
 */
 
-#include <iostream>
+
 #include <string>
 #include <vector>
 #include <stdlib.h>
@@ -45,19 +45,14 @@ TODO: Doit-on faire un main qui appelle compile ?
 #include "./GenCode.cpp"
 
 
-std::string lectureFichier(){
+void lectureFichier(){
   std::ifstream file("/home/gaston/Documents/Polytech/compilation/Tests/prog1.c");
-//  if(file) {
-//    auto tailleSize = file.tellg();
-//    file.seekg(std::ios::beg);
-//    std::string content(file.tellg(), 0);
-//    file.read(&content[0], tailleSize);
-//    return content;
-//  }
-  if ( file ) {
-    std::string line;
-    getline(file,line);
-    return line;
+  std::string res = "";
+  if(file.is_open()) {
+    while(file.good()) {
+      file >> res;
+      code.append(res);
+    }
   }
   else{
     printf("ERREUR FATALE | erreur lecture fichier");
@@ -67,10 +62,14 @@ std::string lectureFichier(){
 
 
 int main() {
-  code = lectureFichier();
+  lectureFichier();
+
+  setListeOperateurs();
   Noeud noeud;
   next();
+
   while (tokenCurrent.type != tokenEOF_){
+    nbVar = 0;
     noeud = AnalSyntaxique();
     AnalyseSementique(noeud);
     GenCode(noeud);

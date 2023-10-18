@@ -90,6 +90,12 @@ void lecture() {
         code.erase(0, 4);
     }
 
+    else if(mot("=")) {
+      tokenCurrent.value = "=";
+      tokenCurrent.type = tokenEgal;
+      code.erase(0,1);
+    }
+
     else if (std::isalpha(code[0]) && code.size() > 0)
     {
         tokenCurrent.type = tokenI;
@@ -103,6 +109,7 @@ void lecture() {
             code.erase(0, 1);
         }
         if(tokenCurrent.value.compare(tokenDEBUG) == 0){
+            std::cout << "debug";
             tokenCurrent.type = tokendebug;
         }
     }
@@ -206,7 +213,6 @@ void next()
     tokenLast.type = tokenCurrent.type;
     tokenLast.value = tokenCurrent.value;
     lecture();
-    printAnaLex();
 }
 
 bool check(TokenType type)
@@ -223,7 +229,61 @@ void accept(TokenType T)
 {
     if (!check(T))
     {
-        std::cout << "ERREUR FATALE | accept()" << std::endl;
-        exit(1);
+      std::cout << "ERREUR FATALE | accept() " << T  << std::endl;
+      if (T == tokenK)
+      {
+        std::cout << tokenLast.value << " : constante" << std::endl;
+      }
+      else if (T == tokenI)
+      {
+        std::cout << tokenLast.value << " : identificateur" << std::endl;
+      }
+      else if (T == tokenPlus ) {
+        std::cout << " : Signe plus" << std::endl;
+      }
+      else if (T == tokenMoins)
+      {
+        std::cout << " : Signe moins" << std::endl;
+      }
+      else if (T == tokenMult)
+      {
+        std::cout << " : Signe mult" << std::endl;
+      }
+      else if (T == tokenDiv)
+      {
+        std::cout << " : Signe div" << std::endl;
+      }
+      else if (T == tokenParaO)
+      {
+        std::cout << " : Signe (" << std::endl;
+      }
+      else if (T == tokenParaF)
+      {
+        std::cout << " : Signe )" << std::endl;
+      }
+      else if (T == tokenEgal)
+      {
+        std::cout << " : Signe =" << std::endl;
+      }
+      else if (T == tokenAccO)
+      {
+        std::cout << " : Signe {";
+      }
+      else if (T == tokenAccF)
+      {
+        std::cout << " : Signe }" << std::endl;
+      }
+      else if (T == tokenvirgule)
+      {
+        std::cout << " : Signe tokenvirgule" << std::endl;
+      }
+      else if (T == tokenPvirgule)
+      {
+        std::cout << " : Signe tokenPvirgule" << std::endl;
+      }
+      else{
+        std::cout << " : Pas trouvé" << std::endl;
+      }
+      exit(1);
     }
 }

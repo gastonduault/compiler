@@ -1,5 +1,4 @@
 int nbVar = 0;
-NoeudType variableLocale;
 
 
 Symbole declarer  (std::string nom){
@@ -40,6 +39,11 @@ void end() {
   }
 }
 
+//void end() {
+//  while(Variables[Variables.size() - 1].m_nom != "") {
+//    Variables.pop_back();
+//  }
+//}
 
 void AnalyseSementique(Noeud N){
   Symbole S;
@@ -48,12 +52,12 @@ void AnalyseSementique(Noeud N){
     default:
       for (int i = 0; i < N.m_sousNoeud.size(); i++)
       {
-        AnalyseSementique(N.m_sousNoeud[i]);
+          AnalyseSementique(N.m_sousNoeud[i]);
       }
       break;// TODO: noeud fonction
     case noeudBlock:
       begin();
-      for (int i = 0; i <= N.m_sousNoeud.size(); i++)
+      for (int i = 0; i < N.m_sousNoeud.size(); i++)
       {
         AnalyseSementique(N.m_sousNoeud[i]);
       }
@@ -63,11 +67,26 @@ void AnalyseSementique(Noeud N){
       S = declarer(N.m_valeur);
       S.position = nbVar;
       nbVar++;
-      S.m_type = variableLocale;
+      S.m_type = variableLocal;
       break;
     case noeudRef:
       S = chercher(N.m_valeur);
       N.m_symbole = S;
+      break;
+    case noeudFonction:
+      nbVar = 0;
+      Symbole s1 = declarer(N.m_valeur);
+      begin();
+//      for(Noeud noeud: N.m_sousNoeud) {
+//        AnalyseSementique(noeud);
+//      }
+      for(int i = 0; i < N.m_sousNoeud.size(); i++) {
+        AnalyseSementique(N.m_sousNoeud[i]);
+      }
+      end();
+      s1.m_type = fonction;
+      s1.nbVars = nbVar - (N.m_sousNoeud.size() - 1);
+      N.m_symbole = s1;
       break;
   }
 }

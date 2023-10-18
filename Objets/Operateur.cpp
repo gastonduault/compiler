@@ -13,7 +13,7 @@ public:
 std::vector<Operateur> listeOperateurs;
 
 void setListeOperateurs() {
-    listeOperateurs.push_back(Operateur(tokenEgal, noeudEgal, 1, 1));
+    listeOperateurs.push_back(Operateur(tokenEgal, noeudAffect, 1, 1));
     listeOperateurs.push_back(Operateur(tokenPlus, noeudAddition, 6, 0));
     listeOperateurs.push_back(Operateur(tokenMoins, noeudSoustraction, 6, 0));
     listeOperateurs.push_back(Operateur(tokenMult, noeudMult, 7, 0));
@@ -25,3 +25,4 @@ void setListeOperateurs() {
     // >
     // ==
 }
+
