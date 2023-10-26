@@ -19,11 +19,11 @@ void printAnaLex()
     {
         std::cout << tokenLast.value << " : Signe moins" << std::endl;
     }
-    else if (tokenLast.type == tokenMult)
+    else if (tokenLast.type == tokenEtoile)
     {
         std::cout << tokenLast.value << " : Signe mult" << std::endl;
     }
-    else if (tokenLast.type == tokenDiv)
+    else if (tokenLast.type == tokenSlash)
     {
         std::cout << tokenLast.value << " : Signe div" << std::endl;
     }
@@ -74,7 +74,7 @@ void lecture() {
 
     if(mot("if")) {
         tokenCurrent.value = "if";
-        tokenCurrent.type = token_if;
+        tokenCurrent.type = tokenIf;
         code.erase(0,2);
     }
 
@@ -86,8 +86,76 @@ void lecture() {
 
     else if(mot("else")) {
         tokenCurrent.value = "else";
-        tokenCurrent.type = token_else;
+        tokenCurrent.type = tokenElse;
         code.erase(0, 4);
+    }
+
+    else if(mot("*")) {
+      tokenCurrent.value = "*";
+      tokenCurrent.type = tokenEtoile;
+      code.erase(0,1);
+    }
+
+    else if(mot("for")) {
+//      printf("ERREUR FATALE | for n'est pas pris en charge \n");
+//      exit(1);
+      tokenCurrent.value = "for";
+      tokenCurrent.type = tokenFor;
+      code.erase(0,3);
+    }
+
+    else if(mot("==")) {
+      tokenCurrent.value = "==";
+      tokenCurrent.type = tokenDoubleEgale;
+      code.erase(0,2);
+    }
+
+    else if(mot("!=")) {
+      tokenCurrent.value = "!=";
+      tokenCurrent.type = tokenDifferend;
+      code.erase(0,2);
+    }
+
+    else if(mot("return")) {
+      tokenCurrent.value = "return";
+      tokenCurrent.type = tokenReturn;
+      code.erase(0,6);
+    }
+
+    else if(mot("||")) {
+      tokenCurrent.value = "||";
+      tokenCurrent.type = tokenOU;
+      code.erase(0,2);
+    }
+
+    else if(mot("&&")) {
+      tokenCurrent.value = "&&";
+      tokenCurrent.type = tokenET;
+      code.erase(0,2);
+    }
+
+    else if(mot(">=")) {
+      tokenCurrent.value = ">=";
+      tokenCurrent.type = tokenSupEgal;
+      code.erase(0,2);
+    }
+
+    else if(mot("<=")) {
+      tokenCurrent.value = "<=";
+      tokenCurrent.type = tokenInfEgal;
+      code.erase(0,2);
+    }
+
+    else if(mot("<")) {
+      tokenCurrent.value = "<";
+      tokenCurrent.type = tokenInf;
+      code.erase(0,1);
+    }
+
+    else if(mot(">")) {
+      tokenCurrent.value = ">";
+      tokenCurrent.type = tokenSup;
+      code.erase(0,1);
     }
 
     else if(mot("=")) {
@@ -96,21 +164,54 @@ void lecture() {
       code.erase(0,1);
     }
 
+
+    else if(mot("debug")) {
+      tokenCurrent.value = "debug";
+      tokenCurrent.type = tokendebug;
+      code.erase(0,5);
+    }
+
+    else if(mot("while")) {
+      tokenCurrent.value = "while";
+      tokenCurrent.type = tokenWhile;
+      code.erase(0,5);
+    }
+
+    else if(mot("switch")) {
+      printf("ERREUR FATALE | switch n'est pas pris en charge \n");
+      exit(1);
+    }
+
+    else if(mot("case")) {
+      printf("ERREUR FATALE | case n'est pas pris en charge \n");
+      exit(1);
+    }
+
+    else if(mot("break")) {
+      printf("ERREUR FATALE | break n'est pas pris en charge \n");
+      exit(1);
+    }
+
+    else if(mot("continue")){
+      printf("ERREUR FATALE | continu n'est pas pris en charge \n");
+      exit(1);
+    }
+    else if(mot("[") || mot("]")){
+      printf("ERREUR FATALE | les tableaux ne sont pas pris en charges \n");
+      exit(1);
+    }
+
     else if (std::isalpha(code[0]) && code.size() > 0)
     {
         tokenCurrent.type = tokenI;
         tokenCurrent.value = code[0];
         code.erase(0, 1);
 
-        // Les caractères qui suivent sont aussi des identificateurs
+
         while (std::isalpha(code[0]) && code.size() > 0)
         {
             tokenCurrent.value += (code[0]);
             code.erase(0, 1);
-        }
-        if(tokenCurrent.value.compare(tokenDEBUG) == 0){
-            std::cout << "debug";
-            tokenCurrent.type = tokendebug;
         }
     }
 
@@ -128,6 +229,13 @@ void lecture() {
         code.erase(0, 1);
     }
 
+    else if (code[0] == '!'&& code.size() > 0)
+    {
+      tokenCurrent.type = tokenNOT;
+      tokenCurrent.value = code[0];
+      code.erase(0, 1);
+    }
+
         // Le caractère courant est signe +
     else if (code[0] == SIGNE_PLUS && code.size() > 0)
     {
@@ -143,23 +251,6 @@ void lecture() {
         tokenCurrent.value = code[0];
         code.erase(0, 1);
     }
-
-        // Le caractère courant est signe *
-    else if (code[0] == SIGNE_MULT && code.size() > 0)
-    {
-        tokenCurrent.type = tokenMult;
-        tokenCurrent.value = code[0];
-        code.erase(0, 1);
-    }
-
-        // Le caractère courant est signe /
-    else if (code[0] == SIGNE_DIV && code.size() > 0)
-    {
-        tokenCurrent.type = tokenDiv;
-        tokenCurrent.value = code[0];
-        code.erase(0, 1);
-    }
-
         // Le caractère courant est signe (
     else if (code[0] == PARA_OUV && code.size() > 0)
     {
@@ -225,10 +316,12 @@ bool check(TokenType type)
     return false;
 }
 
-void accept(TokenType T)
+bool accept(TokenType T)
 {
-    if (!check(T))
+    if (check(T))
     {
+      return true;
+    }else{
       std::cout << "ERREUR FATALE | accept() " << T  << std::endl;
       if (T == tokenK)
       {
@@ -245,11 +338,11 @@ void accept(TokenType T)
       {
         std::cout << " : Signe moins" << std::endl;
       }
-      else if (T == tokenMult)
+      else if (T == tokenEtoile)
       {
         std::cout << " : Signe mult" << std::endl;
       }
-      else if (T == tokenDiv)
+      else if (T == tokenSlash)
       {
         std::cout << " : Signe div" << std::endl;
       }
@@ -284,6 +377,7 @@ void accept(TokenType T)
       else{
         std::cout << " : Pas trouvé" << std::endl;
       }
+      return false;
       exit(1);
     }
 }

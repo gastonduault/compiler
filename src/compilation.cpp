@@ -1,39 +1,9 @@
-/*
-TODO: lecture de tout le fichier dans un string
-TODO: check plus unaire ou addition (pr tous les signes: && == -- || )
-TODO: check  fonction
-TODO: check while if else (Syntaxique)
-TODO: Gencode
-  - addition
-  - soustraction
-  - not
-  - multiplication
-  - division
-  - moins_unaire
-  - pointeur_adresse
-  - noeud ET
-  - noeud return
-  - noeud drop
-  - noeud declaration
-  - noeud ==
-  - noeud !=
-  - noeud reference
-  - noeud affectation
-  - continue
-  - break
-  - target
-  - fonction
-  - loop
-  - appel
-TODO: Doit-on faire un main qui appelle compile ?
-*/
-
 
 #include <string>
 #include <vector>
-#include <stdlib.h>
 #include <fstream>
-
+#include "stdlib.h"
+#include <iostream>
 #include "./Types.cpp"
 #include "./Objets/Token.cpp"
 #include "./Objets/Operateur.cpp"
@@ -44,9 +14,10 @@ TODO: Doit-on faire un main qui appelle compile ?
 #include "./Analyses/AnalyseSemantique.cpp"
 #include "./GenCode.cpp"
 
+std::string chemin = "/home/gaston/Bureau/Compilation_Gaston_DUAULT_Vladimir_GUILLEMONT_app4/Compilation_Gaston_DUAULT_Vladimir_GUILLEMONT_App4/src/Tests/prog1.c";
 
 void lectureFichier(){
-  std::ifstream file("/home/gaston/Documents/Polytech/compilation/Tests/prog1.c");
+  std::ifstream file(chemin);
   std::string res = "";
   if(file.is_open()) {
     while(file.good()) {
@@ -64,13 +35,13 @@ void lectureFichier(){
 int main() {
   lectureFichier();
 
+  debutAssembleur();
   setListeOperateurs();
-  Noeud noeud;
   next();
-
+//  debutAssembleur();
   while (tokenCurrent.type != tokenEOF_){
     nbVar = 0;
-    noeud = AnalSyntaxique();
+    Noeud noeud = AnalSyntaxique();
     AnalyseSementique(noeud);
     GenCode(noeud);
   }

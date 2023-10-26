@@ -1,28 +1,43 @@
-#include <iostream>
 #include <string>
 
 
 // Type à repérer
 enum TokenType
 {
-    tokenK,        // Constante
-    tokenI,        // Identificateur
-    tokenPlus,    // +
-    tokenMoins,   // -
-    tokenDiv,     // /
-    tokenMult,    // *
+    tokenK,        // Constante       V
+    tokenI,        // Identificateur  V
+    tokenPlus,    // +              V
+    tokenMoins,   // -              V
+    tokenEtoile,    // *
+    tokenSlash,    //
     tokenEgal,    // =
     tokenParaO,    // (
     tokenParaF,    // )
     tokenAccO,     // {
     tokenAccF,     // }
+    tokenCrochO,
+    tokenCrochF,
     tokenPvirgule, // ;
     tokenvirgule,  // ,
     tokenEOF_,
     token_int,
     token_if,
     token_else,
-    tokendebug, //TODO: token ==
+    tokenFor,
+    tokenWhile,
+    tokendebug,
+    tokenDoubleEgale,
+    tokenReturn,
+    tokenIf,
+    tokenElse,
+    tokenOU,
+    tokenET,
+    tokenNOT,
+    tokenInf,
+    tokenInfEgal,
+    tokenSup,
+    tokenSupEgal,
+    tokenDifferend,
 };
 
 enum NoeudType
@@ -32,7 +47,7 @@ enum NoeudType
     noeudPlusUnaire,    // +
     noeudMoinsUnaire,   // -
     noeudAddition,
-    noeudSoustraction,
+    noeudSoustraction, //TODO: modulo
     noeudDiv,     // /
     noeudMult,    // *
     noeudEgal,    // =
@@ -53,9 +68,23 @@ enum NoeudType
     noeudAppel,
     noeudFonction,
     noeudIndirection,
+    noeudCondition,
+    noeudLoop,
+    noeudCible,
+    noeudReturn,
+    noeudOU,
+    noeudET,
+    noeudNot,
+    noeudDifferent,
+    noeudInf,
+    noeudInfEgale,
+    noeudSup,
+    noeudSupEgale,
+    noeudDoubleEgale,
+    noeudBreak
 };
 
-enum Types {
+enum SymboleTypes {
   fonction,
   variableLocal
 };
